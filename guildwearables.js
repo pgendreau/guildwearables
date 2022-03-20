@@ -12,8 +12,6 @@ const queries = [];
 const gotchis = [];
 const owners = {};
 
-
-
 for (let address of addresses) {
 
     owners[address] = {'gotchis': []};
@@ -69,11 +67,6 @@ axios.all(queries).then(axios.spread((...responses) => {
       response.data.data.aavegotchis.map(g => owners[g.owner['id']].gotchis.push(g.id));
     };
 
-    //console.log(gotchis.flat());
-    //console.log(owners);
-    //console.log(addresses);
-
-    //for (let gotchi of gotchis.flat()) {
     const wearables = [];
     for (let address of addresses) {
 
@@ -101,9 +94,6 @@ axios.all(queries).then(axios.spread((...responses) => {
             }
         };
 
-        //console.log(address);
-        //console.log(owners[address].gotchis);
-
         axios({
             url: aavegotchiUrl,
             method: 'post',
@@ -125,8 +115,6 @@ axios.all(queries).then(axios.spread((...responses) => {
               `
             }
         }).then(response => {
-            //console.log(address)
-            //console.log(response.data.data.aavegotchis.map(g => [g.id, g.equippedWearables]));
             for (let gotchi of response.data.data.aavegotchis) {
                 for (let wearable of gotchi.equippedWearables.filter((w) => w > 0)) {
                     if((wearable >= 162 && wearable <= 198) || wearable === 210) continue;
@@ -139,10 +127,7 @@ axios.all(queries).then(axios.spread((...responses) => {
 
             try {
                 contract.methods.itemBalances(address.toLowerCase()).call().then((response) => {
-                    //console.log(address);
-                    //console.log(response);
                     for (let wearable of response.map((item) => item[0])) {
-                        //console.log(wearable);
                         if (wearable >= 126 && wearable <= 129) continue;
                         count(wearable);
                     }
@@ -158,8 +143,6 @@ axios.all(queries).then(axios.spread((...responses) => {
                 console.log('error: ', error);
             };
 
-        
-
         }).catch(error => {
             console.log('error: ', error);
         });
@@ -167,4 +150,3 @@ axios.all(queries).then(axios.spread((...responses) => {
 })).catch(errors => {
   console.log('error: ', errors);
 });
-
