@@ -1,4 +1,4 @@
-# guildwearables
+# Guild Wearables
 Inventory guild wearables sorted by number of owners
   * in their inventory
   * equipped on gotchis in their wallet
