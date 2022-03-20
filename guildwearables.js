@@ -16,6 +16,7 @@ for (let address of addresses) {
 
     owners[address] = {'gotchis': []};
 
+    // wallet gotchis
     queries.push(axios({
       url: aavegotchiUrl,
       method: 'post',
@@ -38,6 +39,7 @@ for (let address of addresses) {
       }
     }));
 
+    // vault gotchis
     queries.push(axios({
       url: vaultUrl,
       method: 'post',
@@ -70,21 +72,23 @@ axios.all(queries).then(axios.spread((...responses) => {
     const wearables = [];
     for (let address of addresses) {
 
+        // tally wearables
         function count(wearable) {
             if (!wearables[wearable]) { 
+                // new wearable
                 const name = items[wearable].name;
                 const rarity = items[wearable].rarity;
                 wearables[wearable] = {
                     'id': wearable,
                     'name': name,
                     'rarity': rarity,
-                    'holders': {},
+                    'holders': {[address]: 1},
                     'owners': 1,
                     'count': 1
                 };
-                wearables[wearable].holders[address] = 1;
             } else {
                 if (!wearables[wearable].holders[address]) { 
+                    // new owner
                     wearables[wearable].holders[address] = 1;
                     wearables[wearable].owners += 1;
                 } else {
@@ -94,6 +98,7 @@ axios.all(queries).then(axios.spread((...responses) => {
             }
         };
 
+        // gotchis wearables
         axios({
             url: aavegotchiUrl,
             method: 'post',
@@ -117,17 +122,20 @@ axios.all(queries).then(axios.spread((...responses) => {
         }).then(response => {
             for (let gotchi of response.data.data.aavegotchis) {
                 for (let wearable of gotchi.equippedWearables.filter((w) => w > 0)) {
+                    // exclude badges and h1 background
                     if((wearable >= 162 && wearable <= 198) || wearable === 210) continue;
                     count(wearable);
                 }
             }
 
+            // users wearables
             const web3 = new Web3(rpc);
             const contract = new web3.eth.Contract(abi, aavegotchi);
 
             try {
                 contract.methods.itemBalances(address.toLowerCase()).call().then((response) => {
                     for (let wearable of response.map((item) => item[0])) {
+                        // exclude potions
                         if (wearable >= 126 && wearable <= 129) continue;
                         count(wearable);
                     }
